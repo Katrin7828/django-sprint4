@@ -6,7 +6,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.http import Http404
 
-from .models import Post, Category, Comment
+from .models import Post, Category
 from .forms import CongratulationForm, CommentForm
 
 POSTS_LIMIT = 10
@@ -53,7 +53,7 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('blog:post_detail', post_id=post.id)
+            return redirect('blog:post_detail', id=post.id)
     else:
         form = PostForm()
     return render(request, 'blog/create.html', {'form': form})
@@ -61,9 +61,6 @@ def create_post(request):
 
 def index(request):
     """Выводит записи на главную страницу с пагинацией."""
-    date_now = timezone.now()
-    posts = Post.objects.filter(is_published=True,
-                                pub_date__lte=date_now).order_by('-pub_date')
     post_list = posts()
     paginator = Paginator(post_list, POSTS_LIMIT)
     page_number = request.GET.get('page')
@@ -115,9 +112,9 @@ def edit_post(request, post_id):
         return redirect('blog:post_detail', id=post.id)
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
-    if form.is_valid():
-        form.save()
-        return redirect('blog:post_detail', id=post.id)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:post_detail', id=post.id)
     else:
         form = PostForm(instance=post)
         return render(request, 'blog/create_post.html', {'form': form,
@@ -135,8 +132,8 @@ def add_congratulation(request, post_id):
             congratulation.author = request.user
             congratulation.save()
             return redirect('blog:post_detail', id=post.id)
-        else:
-            form = CongratulationForm()
+    else:
+        form = CongratulationForm()
     return render(request, 'blog/post_detail.html', {'post': post,
                                                      'form': form})
 
@@ -164,7 +161,7 @@ def toggle_publish(request, post_id):
 
 def test_email(request):
     pass
-    return (request, 'blog:index')
+    return redirect('blog:index')
 
 
 @login_required

@@ -7,6 +7,7 @@ from blog.models import Post
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from django.core.paginator import Paginator
+from django.contrib.auth import logout
 
 from .forms import CustomUserCreationForm, EditUserProfileForm
 
@@ -69,3 +70,9 @@ def user_profile(request, username):
     context = {'user_profile': user, 'page_obj': page_obj,
                'is_owner': is_owner}
     return render(request, 'blog/profile.html', context)
+
+
+def custom_logout(request):
+    """Выход из системы с поддержкой GET-запросов."""
+    logout(request)
+    return redirect('blog:index')

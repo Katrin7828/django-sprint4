@@ -102,7 +102,6 @@ class Congratulation(models.Model):
 
 
 class Comment(models.Model):
-    """Модель комментариев к посту."""
     post = models.ForeignKey(
         'Post',
         on_delete=models.CASCADE,

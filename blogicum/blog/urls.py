@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from blog import views
+from . import views
 
 app_name: str = 'blog'
 
@@ -18,5 +18,6 @@ urlpatterns: list = [
     path('post/<int:post_id>/toggle-publish/', views.toggle_publish,
          name='toggle_publish'),
     path('test-email/', views.test_email, name='test_email'),
-    path('posts/<int:post_id>/comment/', views.add_comment, name='add_comment'),
+    path('posts/<int:post_id>/comment/', views.add_comment,
+         name='add_comment'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
