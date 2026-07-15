@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.conf.urls import handler404, handler500, handler403
 from django.shortcuts import render
 
+from users.views import user_profile
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -11,7 +13,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('auth/', include('django.contrib.auth.urls')),
     path('users/', include('users.urls', namespace='users')),
-    path('accounts/profile/', include('blog.urls')),
+    path('profile/<str:username>/', user_profile, name='profile'),
 ]
 
 handler404 = 'django.views.defaults.page_not_found'

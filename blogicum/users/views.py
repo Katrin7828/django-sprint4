@@ -27,19 +27,6 @@ def register(request):
             return render(request, 'auth/registration.html', {'form': form})
 
 
-def user_profile(request, username):
-    user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user)
-    is_owner = request.user.is_authenticated and request.user == user
-
-    context = {
-        'user_profile': user,
-        'posts': posts,
-        'is_owner': is_owner,
-    }
-    return render(request, 'users/profile.html', context)
-
-
 class UserCreateView(CreateView):
     template_name = "registration/registration_form.html"
     form_class = CustomUserCreationForm
@@ -62,7 +49,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user).order_by('-created_at')
+    posts = Post.objects.filter(author=user).order_by('-pub_date')
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)

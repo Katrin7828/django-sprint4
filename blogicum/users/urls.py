@@ -38,4 +38,5 @@ urlpatterns = [
         views.UserProfileUpdateView.as_view(),
         name='edit_profile'),
     path('logout/', views.custom_logout, name='logout'),
+    path('profile/<str:username>/', views.user_profile, name='profile'),
 ]
