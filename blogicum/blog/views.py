@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django import forms
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.core.mail import send_mail
 
 from .models import Post, Category
 from .forms import CongratulationForm
@@ -63,7 +62,7 @@ def create_post(request):
 def index(request):
     """Выводит записи на главную страницу с пагинацией."""
     date_now = timezone.now()
-    posts = Post.objects.filter(is_published=True, 
+    posts = Post.objects.filter(is_published=True,
                                 pub_date__lte=date_now).order_by('-pub_date')
     post_list = posts()
     paginator = Paginator(post_list, 10)
