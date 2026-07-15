@@ -20,4 +20,5 @@ urlpatterns: list = [
     path('test-email/', views.test_email, name='test_email'),
     path('posts/<int:post_id>/comment/', views.add_comment,
          name='add_comment'),
+    path('posts/create/', views.create_post, name='create_post'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

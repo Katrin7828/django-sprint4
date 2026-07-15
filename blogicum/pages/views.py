@@ -14,13 +14,13 @@ class ContactView(TemplateView):
     template_name = 'pages/contact.html'
 
 
-def custom_404(request, exception):
+def page_not_found(request, exception):
     return render(request, 'pages/404.html', status=404)
 
 
-def custom_500(request):
+def server_error(request):
     return render(request, 'pages/500.html', status=500)
 
 
-def custom_403(request, exception):
+def permission_denied(request, exception):
     return render(request, 'pages/403.html', status=403)

@@ -6,7 +6,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.http import Http404
 
-from .models import Post, Category
+from .models import Post, Category, Comment
 from .forms import CongratulationForm, CommentForm
 
 POSTS_LIMIT = 10
@@ -73,13 +73,20 @@ def post_detail(request, id):
     """Выводит отдельную страницу поста."""
     template = 'blog/detail.html'
     post = get_object_or_404(posts(), id=id)
-    context = {'post': post}
+    comments = Comment.objects.filter(post=post,
+                                      is_approved=True).order_by('created_at')
+    form = CommentForm() if request.user.is_authenticated else None
+    context = {
+        'post': post,
+        'comments': comments,
+        'form': form,
+    }
     return render(request, template, context)
 
 
 def category_posts(request, category_slug):
-    """Выводит страницу категории с пагинацией."""
-    category = get_object_or_404(Category, slug=category_slug)
+    category = get_object_or_404(Category, slug=category_slug,
+                                 is_published=True)
     post_list = posts().filter(category__slug=category_slug)
     paginator = Paginator(post_list, POSTS_LIMIT)
     page_number = request.GET.get('page')
@@ -93,15 +100,23 @@ def category_posts(request, category_slug):
 
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user,
-                                pub_date__lte=timezone.now(),
-                                ).order_by('-pub_date')
+    is_owner = request.user.is_authenticated and request.user == user
+    if is_owner:
+        posts = Post.objects.filter(author=user).order_by('-pub_date')
+    else:
+        posts = Post.objects.filter(
+            author=user,
+            is_published=True,
+            pub_date__lte=timezone.now(),
+        ).order_by('-pub_date')
     paginator = Paginator(posts, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    is_owner = request.user.is_authenticated and request.user == user
-    context = {'user_profile': user, 'page_obj': page_obj,
-               'is_owner': is_owner}
+    context = {
+        'user_profile': user,
+        'page_obj': page_obj,
+        'is_owner': is_owner,
+    }
     return render(request, 'blog/profile.html', context)
 
 
