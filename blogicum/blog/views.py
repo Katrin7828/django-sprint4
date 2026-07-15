@@ -194,7 +194,7 @@ def add_comment(request, post_id):
             return render(request, 'blog/detail.html', {
                 'post': post,
                 'form': form,
-                'comments': Comment.objects.filter(post=post, 
+                'comments': Comment.objects.filter(post=post,
                                                    is_approved=True),
             })
     return redirect('blog:post_detail', id=post.id)
