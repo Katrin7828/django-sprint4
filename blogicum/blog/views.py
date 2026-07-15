@@ -182,8 +182,6 @@ def test_email(request):
 @login_required
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if not post.is_published or post.pub_date > timezone.now():
-        raise Http404("Пост не опубликован")
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -192,6 +190,18 @@ def add_comment(request, post_id):
             comment.author = request.user
             comment.save()
             return redirect('blog:post_detail', id=post.id)
-    else:
-        form = CommentForm()
+        else:
+            return render(request, 'blog/detail.html', {
+                'post': post,
+                'form': form,
+                'comments': Comment.objects.filter(post=post, 
+                                                   is_approved=True),
+            })
     return redirect('blog:post_detail', id=post.id)
+
+
+def profile_redirect(request):
+    """Перенаправление на страницу профиля после входа."""
+    if request.user.is_authenticated:
+        return redirect('blog:profile', username=request.user.username)
+    return redirect('blog:index')

@@ -1,20 +1,27 @@
 from django import forms
-from .models import Congratulation, Comment
+from .models import Post, Comment
 
 
-class CongratulationForm(forms.ModelForm):
+class PostForm(forms.ModelForm):
     class Meta:
-        model = Congratulation
-        fields = ['text']
-        widgets = {'text': forms.Textarea(attrs={'rows': 4,
-                                                 'placeholder':
-                                                 'Напишите поздравление автору'
-                                                 'поста...',
-                                                 'class': 'form-control'})}
-        labels = {'text': ''}
+        model = Post
+        fields = ['title', 'text', 'category', 'location', 'is_published',
+                  'image']
 
 
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        }
+
+
+class CongratulationForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        }

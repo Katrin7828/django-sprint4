@@ -11,6 +11,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('auth/', include('django.contrib.auth.urls')),
     path('users/', include('users.urls', namespace='users')),
+    path('accounts/profile/', include('blog.urls')),
 ]
 
 handler404 = 'django.views.defaults.page_not_found'
