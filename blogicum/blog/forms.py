@@ -7,6 +7,16 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['title', 'text', 'category', 'location', 'is_published',
                   'image']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'text': forms.Textarea(attrs={'class': 'form-control',
+                                          'rows': 10}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'location': forms.Select(attrs={'class': 'form-control'}),
+            'is_published': forms.CheckboxInput(attrs={'class':
+                                                       'form-check-input'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+        }
 
 
 class CommentForm(forms.ModelForm):
