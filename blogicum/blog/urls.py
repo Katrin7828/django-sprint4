@@ -21,6 +21,7 @@ urlpatterns = [
     path('profile/<str:username>/', views.user_profile, name='profile'),
     path('test-email/', views.test_email, name='test_email'),
     path('profile/redirect/', views.profile_redirect, name='profile_redirect'),
+    path('profile/<str:username>/edit/', views.edit_profile, name='edit_profile'),
 ]
 
 if settings.DEBUG:

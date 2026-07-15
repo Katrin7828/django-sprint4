@@ -190,6 +190,8 @@ def add_comment(request, post_id):
             comment.author = request.user
             comment.save()
             return redirect('blog:post_detail', id=post.id)
+        else:
+            return redirect('blog:post_detail', id=post.id)
     return redirect('blog:post_detail', id=post.id)
 
 
@@ -198,3 +200,14 @@ def profile_redirect(request):
     if request.user.is_authenticated:
         return redirect('blog:profile', username=request.user.username)
     return redirect('blog:index')
+
+
+@login_required
+def edit_profile(request, username):
+    """Редактирование профиля пользователя."""
+    user = get_object_or_404(User, username=username)
+    if request.user != user:
+        return redirect('blog:profile', username=user.username)
+    if request.method == 'POST':
+        return redirect('blog:profile', username=user.username)
+    return render(request, 'blog/edit_profile.html', {'profile': user})

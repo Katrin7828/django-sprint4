@@ -5,9 +5,9 @@ from django.shortcuts import render
 
 from users.views import user_profile
 
-handler404 = 'django.views.defaults.page_not_found'
-handler500 = 'django.views.defaults.server_error'
-handler403 = 'django.views.defaults.permission_denied'
+handler404 = 'pages.views.page_not_found'
+handler500 = 'pages.views.server_error'
+handler403 = 'pages.views.permission_denied'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
