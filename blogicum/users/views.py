@@ -56,7 +56,7 @@ def user_profile(request, username):
     is_owner = request.user.is_authenticated and request.user == user
     context = {'user_profile': user, 'page_obj': page_obj,
                'is_owner': is_owner}
-    return render(request, 'blog/profile.html', context)
+    return render(request, 'user/profile.html', context)
 
 
 def custom_logout(request):
