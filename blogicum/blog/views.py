@@ -113,7 +113,7 @@ def user_profile(request, username):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'user_profile': user,
+        'profile': user,
         'page_obj': page_obj,
         'is_owner': is_owner,
     }
@@ -190,12 +190,7 @@ def add_comment(request, post_id):
             comment.author = request.user
             comment.save()
             return redirect('blog:post_detail', id=post.id)
-    else:
-        form = CommentForm()
-    return render(request, 'blog/post_detail.html', {
-        'post': post,
-        'form': form,
-    })
+    return redirect('blog:post_detail', id=post.id)
 
 
 def profile_redirect(request):
