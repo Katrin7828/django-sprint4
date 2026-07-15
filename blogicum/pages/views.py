@@ -22,9 +22,10 @@ def server_error(request):
     return render(request, 'pages/500.html', status=500)
 
 
-def permission_denied(request, exception):
-    return render(request, 'pages/403.html', status=403)
-
-
 def csrf_failure(request, reason=''):
     return render(request, 'pages/403_csrf.html', status=403)
+
+
+def permission_denied(request, exception):
+    """Обработчик ошибки 403."""
+    return render(request, 'pages/403.html', status=403)
