@@ -18,7 +18,6 @@ INSTALLED_APPS = [
     'pages.apps.PagesConfig',
     'blog.apps.BlogConfig',
     'django_bootstrap5',
-    'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -92,8 +91,6 @@ STATICFILES_DIRS = [
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTH_USER_MODEL = 'users.User'
 
 MEDIA_URL = '/media/'
 
