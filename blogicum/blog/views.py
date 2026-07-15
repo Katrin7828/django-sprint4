@@ -6,10 +6,10 @@ from django import forms
 from django.contrib.auth.models import User
 from django.http import Http404
 
-from .models import Post, Category
-from .forms import CongratulationForm
+from .models import Post, Category, Comment
+from .forms import CongratulationForm, CommentForm
 
-POSTS_LIMIT = 5
+POSTS_LIMIT = 10
 
 
 def posts():
@@ -53,10 +53,10 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('blog:index')
+            return redirect('blog:post_detail', post_id=post.id)
     else:
         form = PostForm()
-    return render(request, 'blog/create_post.html', {'form': form})
+    return render(request, 'blog/create.html', {'form': form})
 
 
 def index(request):
@@ -65,7 +65,7 @@ def index(request):
     posts = Post.objects.filter(is_published=True,
                                 pub_date__lte=date_now).order_by('-pub_date')
     post_list = posts()
-    paginator = Paginator(post_list, 10)
+    paginator = Paginator(post_list, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {'page_obj': page_obj}
@@ -84,7 +84,7 @@ def category_posts(request, category_slug):
     """Выводит страницу категории с пагинацией."""
     category = get_object_or_404(Category, slug=category_slug)
     post_list = posts().filter(category__slug=category_slug)
-    paginator = Paginator(post_list, 10)
+    paginator = Paginator(post_list, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
@@ -96,8 +96,10 @@ def category_posts(request, category_slug):
 
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user).order_by('-pub_date')
-    paginator = Paginator(posts, 10)
+    posts = Post.objects.filter(author=user,
+                                pub_date__lte=timezone.now(),
+                                ).order_by('-pub_date')
+    paginator = Paginator(posts, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     is_owner = request.user.is_authenticated and request.user == user
@@ -163,3 +165,21 @@ def toggle_publish(request, post_id):
 def test_email(request):
     pass
     return (request, 'blog:index')
+
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if not post.is_published or post.pub_date > timezone.now():
+        raise Http404("Пост не опубликован")
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('blog:post_detail', id=post.id)
+    else:
+        form = CommentForm()
+    return redirect('blog:post_detail', id=post.id)
