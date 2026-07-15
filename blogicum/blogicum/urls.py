@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.conf.urls import handler404, handler500, handler403
 from django.shortcuts import render
 
-from users.views import user_profile
 
 handler404 = 'pages.views.page_not_found'
 handler500 = 'pages.views.server_error'
