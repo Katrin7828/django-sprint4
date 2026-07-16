@@ -1,6 +1,5 @@
-from django.shortcuts import render
 from django.views.generic import TemplateView
-
+from django.shortcuts import render
 
 class AboutView(TemplateView):
     template_name = 'pages/about.html'
@@ -16,18 +15,14 @@ class ContactView(TemplateView):
 
 class PageNotFoundView(TemplateView):
     template_name = 'pages/404.html'
- 
+
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context, status=404)
 
 
-class ServerErrorView(TemplateView):
-    template_name = 'pages/500.html'
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context, status=500)
+def server_error(request):
+    return render(request, 'pages/500.html', status=500)
 
 
 class PermissionDeniedView(TemplateView):

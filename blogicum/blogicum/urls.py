@@ -1,16 +1,15 @@
 from django.urls import include, path
 from django.contrib import admin
-from django.shortcuts import render
+
 from pages.views import (
     PageNotFoundView,
-    ServerErrorView,
     PermissionDeniedView,
     CsrfFailureView,
 )
 
 
 handler404 = PageNotFoundView.as_view()
-handler500 = ServerErrorView.as_view()
+handler500 = 'pages.views.server_error'
 handler403 = PermissionDeniedView.as_view()
 handler403_csrf = CsrfFailureView.as_view()
 
