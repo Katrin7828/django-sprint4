@@ -111,5 +111,3 @@ handler500 = 'pages.views.server_error'
 handler403 = 'pages.views.permission_denied'
 
 CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
-
-

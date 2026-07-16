@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from django.contrib.auth.models import User
-from django.http import Http404
 
 from .models import Post, Category, Comment
 from .forms import CommentForm, UserProfileForm
@@ -201,7 +200,8 @@ def edit_profile(request):
             return redirect('blog:profile', username=request.user.username)
     else:
         form = UserProfileForm(instance=request.user)
-    return render(request, 'blog/user.html', {'form': form, 'profile': request.user})
+    return render(request, 'blog/user.html', {'form': form,
+                                              'profile': request.user})
 
 
 @login_required
