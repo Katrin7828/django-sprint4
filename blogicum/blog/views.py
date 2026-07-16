@@ -2,12 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from django.contrib.auth.models import User
+from django.http import Http404
 
 from .models import Post, Category, Comment
-from .forms import CommentForm, UserProfileForm
+from .forms import CommentForm, UserProfileForm, CongratulationForm
 
 POSTS_LIMIT = 10
 
@@ -74,12 +74,15 @@ def index(request):
 def post_detail(request, id):
     """Выводит отдельную страницу поста."""
     template = 'blog/detail.html'
-    post = get_object_or_404(Post, id=id)
-    if not post.is_published or post.pub_date > timezone.now():
+    try:
+        post = Post.objects.get(id=id, is_published=True,
+                                pub_date__lte=timezone.now())
+    except Post.DoesNotExist:
+        post = get_object_or_404(Post, id=id)
         if request.user != post.author:
-            return render(request, 'pages/404.html')
-    comments = Comment.objects.filter(
-        post=post, is_approved=True).order_by('created_at')
+            raise Http404("Пост не найден или недоступен")
+    comments = Comment.objects.filter(post=post,
+                                      is_approved=True).order_by('created_at')
     form = CommentForm()
     context = {
         'post': post,
@@ -133,6 +136,9 @@ def edit_post(request, post_id):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
+            is_published = form.cleaned_data.get('is_published')
+            if is_published is not None:
+                post.is_published = is_published
             form.save()
             return redirect('blog:profile', username=request.user.username)
     else:
@@ -144,25 +150,9 @@ def edit_post(request, post_id):
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if post.author != request.user:
-        return render(request, 'pages/404.html')
-    if request.method == 'POST':
-        post.delete()
-        return redirect('blog:profile', username=request.user.username)
-    return render(request, 'blog/delete_post.html', {'post': post})
-
-
-@login_required
-def toggle_publish(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if post.author != request.user and not request.user.is_staff:
-        return render(request, 'pages/404.html')
-    post.is_published = not post.is_published
-    post.save()
-    return redirect('blog:post_detail', id=post.id)
-
-
-def test_email(request):
-    return redirect('blog:index')
+        return render(request, 'pages/404.html', status=404)
+    post.delete()
+    return redirect('blog:profile', username=request.user.username)
 
 
 @login_required
@@ -170,7 +160,7 @@ def add_comment(request, post_id):
     try:
         post = Post.objects.get(id=post_id)
     except Post.DoesNotExist:
-        return render(request, 'pages/404.html')
+        return render(request, 'pages/404.html', status=404) 
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -180,28 +170,6 @@ def add_comment(request, post_id):
             comment.save()
             return redirect('blog:post_detail', id=post.id)
     return redirect('blog:post_detail', id=post.id)
-
-
-def profile_redirect(request):
-    """Перенаправление на страницу профиля после входа."""
-    if request.user.is_authenticated:
-        return redirect('blog:profile', username=request.user.username)
-    return redirect('blog:index')
-
-
-@csrf_exempt
-@login_required
-def edit_profile(request):
-    """Редактирование профиля текущего пользователя."""
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('blog:profile', username=request.user.username)
-    else:
-        form = UserProfileForm(instance=request.user)
-    return render(request, 'blog/user.html', {'form': form,
-                                              'profile': request.user})
 
 
 @login_required
@@ -217,8 +185,8 @@ def edit_comment(request, post_id, comment_id):
             return redirect('blog:post_detail', id=post_id)
     else:
         form = CommentForm(instance=comment)
-    return render(request, 'blog/user.html', {'form': form,
-                                              'comment': comment})
+    return render(request, 'blog/comment.html', {'form': form,
+                                                 'comment': comment})
 
 
 @login_required
@@ -230,4 +198,17 @@ def delete_comment(request, post_id, comment_id):
     if request.method == 'POST':
         comment.delete()
         return redirect('blog:post_detail', id=post_id)
-    return render(request, 'blog/index.html', {'comment': comment})
+    return render(request, 'blog/comment.html', {'comment': comment})
+
+
+@login_required
+def edit_profile(request):
+    """Редактирование профиля текущего пользователя."""
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:profile', username=request.user.username)
+    else:
+        form = UserProfileForm(instance=request.user)
+    return render(request, 'blog/user.html', {'form': form})
