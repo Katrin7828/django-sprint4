@@ -54,9 +54,9 @@ def create_post(request):
             post.author = request.user
             post.save()
             return redirect('blog:post_detail', id=post.id)
-    else:
-        form = PostForm()
-    return render(request, 'blog/create.html', {'form': form})
+        else:
+            form = PostForm()
+            return render(request, 'blog/create.html', {'form': form})
 
 
 def index(request):
@@ -75,7 +75,8 @@ def post_detail(request, id):
     post = get_object_or_404(posts(), id=id)
     comments = Comment.objects.filter(post=post,
                                       is_approved=True).order_by('created_at')
-    form = CommentForm() if request.user.is_authenticated else None
+    if request.user.is_authenticated:
+        form = CommentForm()
     context = {
         'post': post,
         'comments': comments,
@@ -171,6 +172,14 @@ def add_comment(request, post_id):
             comment.author = request.user
             comment.save()
             return redirect('blog:post_detail', id=post.id)
+        else:
+            comments = Comment.objects.filter(
+                post=post, is_approved=True).order_by('created_at')
+            return render(request, 'blog/detail.html', {
+                'post': post,
+                'form': form,
+                'comments': comments,
+            })
     return redirect('blog:post_detail', id=post.id)
 
 
