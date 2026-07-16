@@ -173,15 +173,12 @@ def add_comment(request, post_id):
             comment.author = request.user
             comment.save()
             return redirect('blog:post_detail', id=post.id)
-        else:
-            comments = Comment.objects.filter(
-                post=post, is_approved=True).order_by('created_at')
-            return render(request, 'blog/detail.html', {
-                'post': post,
-                'form': form,
-                'comments': comments,
-            })
-    return redirect('blog:post_detail', id=post.id)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/post_detail.html', {
+        'post': post,
+        'form': form,
+    })
 
 
 def profile_redirect(request):

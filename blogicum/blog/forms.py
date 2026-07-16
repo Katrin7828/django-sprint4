@@ -38,7 +38,10 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ['text']
         widgets = {
-            'text': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'text': forms.Textarea(attrs={'rows': 3,
+                                          'class': 'form-control',
+                                          'placeholder':
+                                          'Напишите комментарий'}),
         }
 
 
@@ -47,5 +50,5 @@ class CongratulationForm(forms.ModelForm):
         model = Congratulation
         fields = ['text']
         widgets = {
-            'text': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'text': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
