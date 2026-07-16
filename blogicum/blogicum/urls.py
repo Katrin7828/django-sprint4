@@ -4,14 +4,12 @@ from django.contrib import admin
 from pages.views import (
     PageNotFoundView,
     PermissionDeniedView,
-    CsrfFailureView,
+    server_error,
 )
 
-
 handler404 = PageNotFoundView.as_view()
-handler500 = 'pages.views.server_error'
+handler500 = server_error
 handler403 = PermissionDeniedView.as_view()
-handler403_csrf = CsrfFailureView.as_view()
 
 urlpatterns = [
     path('admin/', admin.site.urls),

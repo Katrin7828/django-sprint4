@@ -34,9 +34,5 @@ class PermissionDeniedView(TemplateView):
         return self.render_to_response(context, status=403)
 
 
-class CsrfFailureView(TemplateView):
-    template_name = 'pages/403_csrf.html'
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context, status=403)
+def csrf_failure(request):
+    return render(request, 'pages/403csrf.html', status=403)
