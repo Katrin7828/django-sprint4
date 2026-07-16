@@ -1,5 +1,6 @@
 from django import forms
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from .models import Post, Comment, Congratulation
 
@@ -52,3 +53,9 @@ class CongratulationForm(forms.ModelForm):
         widgets = {
             'text': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']

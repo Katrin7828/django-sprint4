@@ -4,9 +4,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-%(2soe$-9sa9mbth86$0y&h!89w$&j^mkn0*p%h524wubuew6a'
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS: list = []
+ALLOWED_HOSTS: list = ['localhost', '127.0.0.1', '*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -56,7 +56,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -111,3 +111,5 @@ handler500 = 'pages.views.server_error'
 handler403 = 'pages.views.permission_denied'
 
 CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
+
+

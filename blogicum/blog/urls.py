@@ -16,13 +16,18 @@ urlpatterns = [
          name='toggle_publish'),
     path('posts/<int:post_id>/comment/', views.add_comment,
          name='add_comment'),
+    path('posts/<int:post_id>/comment/<int:comment_id>/edit/',
+         views.edit_comment, name='edit_comment'),
+    path('posts/<int:post_id>/comment/<int:comment_id>/delete/',
+         views.delete_comment, name='delete_comment'),
     path('category/<slug:category_slug>/', views.category_posts,
          name='category_posts'),
-    path('profile/<str:username>/', views.user_profile, name='profile'),
-    path('test-email/', views.test_email, name='test_email'),
-    path('profile/redirect/', views.profile_redirect, name='profile_redirect'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('profile/<str:username>/', views.user_profile, name='profile'),
+    path('profile/redirect/', views.profile_redirect, name='profile_redirect'),
+    path('test-email/', views.test_email, name='test_email'),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

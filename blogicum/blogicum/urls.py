@@ -5,6 +5,8 @@ from pages.views import (
     PageNotFoundView,
     PermissionDeniedView,
 )
+from blog.views import edit_profile
+
 
 handler404 = PageNotFoundView.as_view()
 handler500 = 'pages.views.server_error'
@@ -17,4 +19,5 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('auth/', include('django.contrib.auth.urls')),
     path('', include('users.urls', namespace='users')),
+    path('profile/edit/', edit_profile, name='edit_profile'),
 ]
