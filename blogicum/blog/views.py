@@ -54,6 +54,8 @@ def create_post(request):
             post.author = request.user
             post.save()
             return redirect('blog:post_detail', id=post.id)
+        else:
+            return render(request, 'blog/create.html', {'form': form})
     else:
         form = PostForm()
     return render(request, 'blog/create.html', {'form': form})
@@ -73,10 +75,9 @@ def post_detail(request, id):
     """Выводит отдельную страницу поста."""
     template = 'blog/detail.html'
     post = get_object_or_404(posts(), id=id)
-    comments = Comment.objects.filter(post=post,
-                                      is_approved=True).order_by('created_at')
-    if request.user.is_authenticated:
-        form = CommentForm()
+    comments = Comment.objects.filter(
+        post=post, is_approved=True).order_by('created_at')
+    form = CommentForm()
     context = {
         'post': post,
         'comments': comments,
