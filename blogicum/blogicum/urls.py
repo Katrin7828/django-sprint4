@@ -11,10 +11,10 @@ handler403 = 'pages.views.permission_denied'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
-    path('pages/', include('pages.urls')),
+    path('pages/', include('pages.urls', namespace='pages')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('auth/', include('django.contrib.auth.urls')),
-    path('users/', include('users.urls', namespace='users')),
+    path('', include('users.urls', namespace='users')),
 ]
 
 
@@ -27,4 +27,4 @@ def server_error(request):
 
 
 def permission_denied(request, exception):
-    return render(request, 'pages/403.html', status=403)
+    return render(request, 'pages/403csrf.html', status=403)
