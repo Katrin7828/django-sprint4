@@ -54,9 +54,9 @@ def create_post(request):
             post.author = request.user
             post.save()
             return redirect('blog:post_detail', id=post.id)
-        else:
-            form = PostForm()
-            return render(request, 'blog/create.html', {'form': form})
+    else:
+        form = PostForm()
+    return render(request, 'blog/create.html', {'form': form})
 
 
 def index(request):
