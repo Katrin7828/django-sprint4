@@ -23,7 +23,8 @@ class PostForm(forms.ModelForm):
                   'image', 'pub_date']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 10}),
+            'text': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 10}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'location': forms.Select(attrs={'class': 'form-control'}),
             'is_published': forms.CheckboxInput(attrs={
