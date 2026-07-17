@@ -5,9 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django import forms
 from django.contrib.auth.models import User
 from django.http import Http404
+from django.db.models import Count
 
-from .models import Post, Category, Comment
-from .forms import CommentForm, UserProfileForm, CongratulationForm
+from .models import Post, Category, Comment, Congratulation
+from .forms import CommentForm, UserProfileForm
 
 POSTS_LIMIT = 10
 
@@ -62,8 +63,7 @@ def create_post(request):
 
 
 def index(request):
-    """Выводит записи на главную страницу с пагинацией."""
-    post_list = posts()
+    post_list = posts().annotate(comment_count=Count('congratulations'))
     paginator = Paginator(post_list, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -81,8 +81,8 @@ def post_detail(request, id):
         post = get_object_or_404(Post, id=id)
         if request.user != post.author:
             raise Http404("Пост не найден или недоступен")
-    comments = Comment.objects.filter(post=post,
-                                      is_approved=True).order_by('created_at')
+    comments = Congratulation.objects.filter(
+        post=post).order_by('created_at')
     form = CommentForm()
     context = {
         'post': post,
@@ -95,7 +95,8 @@ def post_detail(request, id):
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug,
                                  is_published=True)
-    post_list = posts().filter(category__slug=category_slug)
+    post_list = posts().filter(category__slug=category_slug).annotate(
+        comment_count=Count('congratulations'))
     paginator = Paginator(post_list, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -157,25 +158,32 @@ def delete_post(request, post_id):
 
 @login_required
 def add_comment(request, post_id):
-    try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        return render(request, 'pages/404.html', status=404) 
+    post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
+            congratulation = Congratulation.objects.create(
+                text=form.cleaned_data['text'],
+                post=post,
+                author=request.user,
+            )
             return redirect('blog:post_detail', id=post.id)
+        else:
+            comments = Congratulation.objects.filter(
+                post=post,
+                is_approved=True).order_by('created_at')
+            return render(request, 'blog/detail.html', {
+                'post': post,
+                'form': form,
+                'comments': comments,
+            })
     return redirect('blog:post_detail', id=post.id)
 
 
 @login_required
 def edit_comment(request, post_id, comment_id):
     """Редактирование комментария."""
-    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    comment = get_object_or_404(Congratulation, id=comment_id, post_id=post_id)
     if comment.author != request.user:
         return redirect('blog:post_detail', id=post_id)
     if request.method == 'POST':
@@ -192,7 +200,7 @@ def edit_comment(request, post_id, comment_id):
 @login_required
 def delete_comment(request, post_id, comment_id):
     """Удаление комментария."""
-    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    comment = get_object_or_404(Congratulation, id=comment_id, post_id=post_id)
     if comment.author != request.user:
         return redirect('blog:post_detail', id=post_id)
     if request.method == 'POST':
