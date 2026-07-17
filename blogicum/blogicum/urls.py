@@ -7,7 +7,6 @@ from django.urls import reverse_lazy
 from blog.views import edit_profile
 
 
-handler403 = 'pages.views.csrf_failure'
 handler404 = 'pages.views.page_not_found'
 handler500 = 'pages.views.server_error'
 
@@ -25,7 +24,5 @@ urlpatterns = [
         ),
         name='registration',
     ),
-    path('auth/', include('django.contrib.auth.urls')),
-    path('', include('users.urls', namespace='users')),
     path('profile/edit/', edit_profile, name='edit_profile'),
 ]

@@ -27,8 +27,3 @@ def server_error(request):
 def csrf_failure(request, reason=''):
     """Обработчик ошибки CSRF."""
     return render(request, 'pages/403csrf.html', status=403)
-
-
-def permission_denied(request, exception):
-    """Обработчик ошибки 403."""
-    return render(request, 'pages/403.html', status=403)
