@@ -118,6 +118,7 @@ def user_profile(request, username):
             is_published=True,
             pub_date__lte=timezone.now(),
         ).order_by('-pub_date')
+    posts = posts.annotate(comment_count=Count('congratulations'))
     paginator = Paginator(posts, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
