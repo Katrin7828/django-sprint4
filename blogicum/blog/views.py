@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.db.models import Count
 
-from .models import Post, Category, Comment, Congratulation
+from .models import Post, Category, Congratulation
 from .forms import CommentForm, UserProfileForm
 
 POSTS_LIMIT = 10
@@ -162,7 +162,7 @@ def add_comment(request, post_id):
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
-            congratulation = Congratulation.objects.create(
+            Congratulation.objects.create(
                 text=form.cleaned_data['text'],
                 post=post,
                 author=request.user,
