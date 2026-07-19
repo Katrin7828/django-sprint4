@@ -2,16 +2,16 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout
+from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.db.models import Count
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView
 
 from .models import Post, Category, Comment
-from .forms import PostForm, CommentForm, UserProfileForm
+from .forms import PostForm, CommentForm
 from .forms import CustomUserCreationForm, EditUserProfileForm
 
 POSTS_LIMIT = 10
@@ -54,8 +54,6 @@ def get_posts(with_filters=False, with_annotation=False):
         posts_qs = posts_qs.annotate(
             comment_count=Count('comments'),
         ).order_by('-pub_date')
-    else:
-        posts_qs = posts_qs.order_by('-pub_date')
     return posts_qs
 
 
@@ -70,14 +68,14 @@ def paginate_posts(request, queryset, per_page=POSTS_LIMIT):
 class UserCreateView(CreateView):
     """Регистрация нового пользователя."""
 
-    template_name = "registration/registration_form.html"
+    template_name = 'registration/registration_form.html'
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy("blog:index")
+    success_url = reverse_lazy('blog:index')
 
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
-        return redirect("blog:index")
+        return redirect('blog:index')
 
 
 class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -85,16 +83,10 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     model = User
     form_class = EditUserProfileForm
-    template_name = "blog/user.html"
+    template_name = 'blog/user.html'
 
     def get_object(self):
         return self.request.user
-
-
-def custom_logout(request):
-    """Выход из системы с поддержкой GET-запросов."""
-    logout(request)
-    return redirect('blog:index')
 
 
 @login_required
@@ -126,7 +118,7 @@ def post_detail(request, post_id):
         raise Http404('Пост не найден или недоступен')
     comments = Comment.objects.filter(
         post=post,
-    ).order_by('created_at')
+    ).select_related('author')
     form = CommentForm()
     context = {
         'post': post,
@@ -197,22 +189,20 @@ def delete_post(request, post_id):
 def add_comment(request, post_id):
     """Оставить комментарий к посту."""
     post = get_object_or_404(Post, id=post_id)
+    if (post.author != request.user and (
+        not post.is_published
+        or not post.category.is_published
+        or post.pub_date > timezone.now()
+    )):
+        raise Http404('Нельзя комментировать этот пост')
     form = CommentForm(request.POST or None)
     if form.is_valid():
-        Comment.objects.create(
-            text=form.cleaned_data['text'],
-            post=post,
-            author=request.user,
-        )
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+        comment.save()
         return redirect('blog:post_detail', post_id=post.id)
-    comments = Comment.objects.filter(
-        post=post,
-    ).order_by('created_at')
-    return render(request, 'blog/detail.html', {
-        'post': post,
-        'form': form,
-        'comments': comments,
-    })
+    return render(request, 'blog/detail.html')
 
 
 @login_required
@@ -244,7 +234,7 @@ def delete_comment(request, post_id, comment_id):
 @login_required
 def edit_profile(request):
     """Редактирование профиля текущего пользователя."""
-    form = UserProfileForm(request.POST or None, instance=request.user)
+    form = EditUserProfileForm(request.POST or None, instance=request.user)
     if form.is_valid():
         form.save()
         return redirect('blog:profile', username=request.user.username)

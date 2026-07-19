@@ -93,13 +93,9 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Автор комментария',
     )
-    is_approved = models.BooleanField(
-        default=True,
-        verbose_name='Одобрен',
-    )
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ('created_at',)
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
 

@@ -48,19 +48,17 @@ class CommentForm(forms.ModelForm):
         }
 
 
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ('first_name', 'last_name', 'email', 'username')
-
-
 class CustomUserCreationForm(UserCreationForm):
+    """Форма для регистрации нового пользователя."""
+
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
 
 
 class EditUserProfileForm(forms.ModelForm):
+    """Форма для редактирования профиля пользователя."""
+
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
