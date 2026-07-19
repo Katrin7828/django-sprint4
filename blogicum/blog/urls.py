@@ -40,9 +40,10 @@ urlpatterns = [
         template_name='registration/password_change_form.html',
         success_url=reverse_lazy('blog:password_change_done'),
     ), name='password_change'),
-    path('auth/password_change/done/', auth_views.PasswordChangeDoneView.as_view(
-        template_name='registration/password_change_done.html',
-    ), name='password_change_done'),
+    path('auth/password_change/done/',
+         auth_views.PasswordChangeDoneView.as_view(
+             template_name='registration/password_change_done.html',
+         ), name='password_change_done'),
     path('auth/password_reset/', auth_views.PasswordResetView.as_view(
         template_name='registration/password_reset_form.html',
         email_template_name='registration/password_reset_email.html',
