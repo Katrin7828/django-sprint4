@@ -12,7 +12,7 @@ from django.views.generic import CreateView, UpdateView
 
 from .models import Post, Category, Comment
 from .forms import PostForm, CommentForm
-from .forms import CustomUserCreationForm, EditUserProfileForm
+from .forms import EditUserProfileForm
 
 POSTS_LIMIT = 10
 
@@ -69,7 +69,7 @@ class UserCreateView(CreateView):
     """Регистрация нового пользователя."""
 
     template_name = 'registration/registration_form.html'
-    form_class = CustomUserCreationForm
+    form_class = EditUserProfileForm
     success_url = reverse_lazy('blog:index')
 
     def form_valid(self, form):
@@ -189,12 +189,6 @@ def delete_post(request, post_id):
 def add_comment(request, post_id):
     """Оставить комментарий к посту."""
     post = get_object_or_404(Post, id=post_id)
-    if (post.author != request.user and (
-        not post.is_published
-        or not post.category.is_published
-        or post.pub_date > timezone.now()
-    )):
-        raise Http404('Нельзя комментировать этот пост')
     form = CommentForm(request.POST or None)
     if form.is_valid():
         comment = form.save(commit=False)
