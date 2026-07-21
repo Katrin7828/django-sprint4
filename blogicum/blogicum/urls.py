@@ -19,7 +19,9 @@ urlpatterns = [
         template_name='registration/login.html',
     ), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(
+        http_method_names=['get', 'post'], next_page='blog:index'),
+        name='logout'),
     path('auth/registration/', CreateView.as_view(
         template_name='registration/registration_form.html',
         form_class=UserCreationForm,
@@ -55,5 +57,7 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)

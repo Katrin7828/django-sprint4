@@ -1,12 +1,18 @@
 from pathlib import Path
+import os
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-%(2soe$-9sa9mbth86$0y&h!89w$&j^mkn0*p%h524wubuew6a'
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS: list = ['localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS: list = [
+    'www.blogicumkatrin.pythonanywhere.com',
+    'blogicumkatrin.pythonanywhere.com',
+    'localhost', '127.0.0.1', '0.0.0.0',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -87,14 +93,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    os.path.join(BASE_DIR, 'static'),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
@@ -102,8 +110,6 @@ EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 LOGIN_URL = '/login/'
 
-LOGIN_REDIRECT_URL = '/'
-
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'blog:index'
 
 CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
